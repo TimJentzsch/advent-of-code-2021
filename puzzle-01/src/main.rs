@@ -40,3 +40,12 @@ fn count_depth_increases(contents: String) -> u32 {
 
     depth_increases
 }
+
+#[test]
+fn should_count_depth_increases() {
+    // Example from the task description
+    let contents = "199\n200\n208\n210\n200\n207\n240\n269\n260\n263\n".to_string();
+    let actual = count_depth_increases(contents);
+
+    assert_eq!(actual, 7);
+}
