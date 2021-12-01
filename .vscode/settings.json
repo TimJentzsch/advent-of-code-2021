@@ -1,0 +1,9 @@
+{
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.eol": "\n",
+  "files.exclude": {
+    "**/target": true,
+    "**/Cargo.lock": true
+  }
+}
