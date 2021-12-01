@@ -8,9 +8,12 @@ fn main() {
     let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
     let depths = parse_depths(contents);
-    let depth_increases = count_depth_increases(depths);
+    let depth_increases = count_depth_increases(depths.clone());
+    let sliding_windows = create_sliding_windows(depths, 3);
+    let window_increases = count_depth_increases(sliding_windows);
 
     println!("The depth increased {} number of times.", depth_increases);
+    println!("The window depth increased {} number of times.", window_increases);
 }
 
 /// Parse the depth values provided in the file.
