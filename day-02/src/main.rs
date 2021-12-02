@@ -1,7 +1,4 @@
-use std::{
-    fs,
-    num::{IntErrorKind, ParseIntError},
-};
+use std::fs;
 
 #[derive(Debug, PartialEq)]
 struct ParseCommandError;
@@ -10,6 +7,24 @@ struct ParseCommandError;
 struct SubmarinePosition {
     depth: usize,
     horizontal_position: usize,
+}
+
+impl SubmarinePosition {
+    /// Executes the given command.
+    fn execute_cmd(&mut self, cmd: SubmarineCommand) {
+        match cmd {
+            SubmarineCommand::Forward(value) => self.horizontal_position += value,
+            SubmarineCommand::Down(value) => self.depth += value,
+            SubmarineCommand::Up(value) => self.depth -= value,
+        }
+    }
+
+    /// Execute a list of commands.
+    fn execute_cmd_list(&mut self, cmd_list: Vec<SubmarineCommand>) {
+        for cmd in cmd_list {
+            self.execute_cmd(cmd);
+        }
+    }
 }
 
 /// A command to control the submarine.
@@ -57,14 +72,14 @@ fn parse_command(line: String) -> Result<SubmarineCommand, ParseCommandError> {
             } else {
                 Err(ParseCommandError)
             }
-        },
+        }
         Some("up") => {
             if let Ok(value) = parse_command_value(tokens.next()) {
                 Ok(SubmarineCommand::Up(value))
             } else {
                 Err(ParseCommandError)
             }
-        },
+        }
         _ => Err(ParseCommandError),
     }
 }
