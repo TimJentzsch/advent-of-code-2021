@@ -1,4 +1,10 @@
-use std::{fs, vec, string::ParseError};
+use std::{
+    fs,
+    num::{IntErrorKind, ParseIntError},
+};
+
+#[derive(Debug, PartialEq)]
+struct ParseCommandError;
 
 /// The current position of the submarine.
 struct SubmarinePosition {
@@ -21,9 +27,46 @@ fn main() {
     println!("{}", input);
 }
 
+/// Parse the integer value of a command
+fn parse_command_value(token: Option<&str>) -> Result<usize, ParseCommandError> {
+    if let Some(token_str) = token {
+        match token_str.parse::<usize>() {
+            Ok(value) => Ok(value),
+            Err(_) => Err(ParseCommandError),
+        }
+    } else {
+        Err(ParseCommandError)
+    }
+}
+
 /// Parse a single command.
-fn parse_command(_line: String) -> Result<SubmarineCommand, ParseError> {
-    Ok(SubmarineCommand::Down(0))
+fn parse_command(line: String) -> Result<SubmarineCommand, ParseCommandError> {
+    let mut tokens = line.split_whitespace();
+
+    match tokens.next() {
+        Some("forward") => {
+            if let Ok(value) = parse_command_value(tokens.next()) {
+                Ok(SubmarineCommand::Forward(value))
+            } else {
+                Err(ParseCommandError)
+            }
+        }
+        Some("down") => {
+            if let Ok(value) = parse_command_value(tokens.next()) {
+                Ok(SubmarineCommand::Down(value))
+            } else {
+                Err(ParseCommandError)
+            }
+        },
+        Some("up") => {
+            if let Ok(value) = parse_command_value(tokens.next()) {
+                Ok(SubmarineCommand::Up(value))
+            } else {
+                Err(ParseCommandError)
+            }
+        },
+        _ => Err(ParseCommandError),
+    }
 }
 
 /// Parse the given input to commands.
