@@ -39,7 +39,22 @@ fn main() {
     // Read the input file
     let filename = "./input/input.txt";
     let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
-    println!("{}", input);
+
+    let cmd_list = parse_command_list(input);
+
+    let mut pos = SubmarinePosition {
+        depth: 0,
+        horizontal_position: 0,
+    };
+
+    pos.execute_cmd_list(cmd_list);
+
+    println!(
+        "The submarine is at depth {} and horizontal position {} (value {})",
+        pos.depth,
+        pos.horizontal_position,
+        pos.depth * pos.horizontal_position
+    );
 }
 
 /// Parse the integer value of a command
