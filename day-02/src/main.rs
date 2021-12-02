@@ -4,18 +4,32 @@ use std::fs;
 struct ParseCommandError;
 
 /// The current position of the submarine.
+#[derive(Debug, PartialEq)]
 struct SubmarinePosition {
     depth: usize,
     horizontal_position: usize,
+    aim: usize,
 }
 
 impl SubmarinePosition {
+    /// Create a new submarine position.
+    fn new() -> Self {
+        SubmarinePosition {
+            depth: 0,
+            horizontal_position: 0,
+            aim: 0,
+        }
+    }
+
     /// Executes the given command.
     fn execute_cmd(&mut self, cmd: SubmarineCommand) {
         match cmd {
-            SubmarineCommand::Forward(value) => self.horizontal_position += value,
-            SubmarineCommand::Down(value) => self.depth += value,
-            SubmarineCommand::Up(value) => self.depth -= value,
+            SubmarineCommand::Forward(value) => {
+                self.horizontal_position += value;
+                self.depth += self.aim * value;
+            }
+            SubmarineCommand::Down(value) => self.aim += value,
+            SubmarineCommand::Up(value) => self.aim -= value,
         }
     }
 
@@ -42,10 +56,7 @@ fn main() {
 
     let cmd_list = parse_command_list(input);
 
-    let mut pos = SubmarinePosition {
-        depth: 0,
-        horizontal_position: 0,
-    };
+    let mut pos = SubmarinePosition::new();
 
     pos.execute_cmd_list(cmd_list);
 
@@ -155,6 +166,27 @@ fn should_parse_command_list() {
         SubmarineCommand::Forward(2),
     ];
     let actual = parse_command_list(input);
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn should_execute_commands() {
+    let cmd_list = vec![
+        SubmarineCommand::Forward(5),
+        SubmarineCommand::Down(5),
+        SubmarineCommand::Forward(8),
+        SubmarineCommand::Up(3),
+        SubmarineCommand::Down(8),
+        SubmarineCommand::Forward(2),
+    ];
+    let mut actual = SubmarinePosition::new();
+    actual.execute_cmd_list(cmd_list);
+    let expected = SubmarinePosition {
+        aim: 10,
+        depth: 60,
+        horizontal_position: 15,
+    };
 
     assert_eq!(actual, expected);
 }
