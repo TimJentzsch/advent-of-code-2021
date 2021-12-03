@@ -6,10 +6,19 @@ fn main() {
     let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
     let values = parse_value_list(input);
-    let (gamma, epsilon) = determine_gamma_and_eplison(values, 12);
+    let (gamma, epsilon) = determine_gamma_and_eplison(&values, 12);
     let power_consumption = gamma as u32 * epsilon as u32;
 
     println!("The power consumption is {}", power_consumption);
+
+    let oxygen_generator_rating = determine_oxygen_generator_rating(values.clone(), 12);
+    let c02_scrubber_rating = determine_co2_scrubber_rating(values.clone(), 12);
+    let life_support_rating = oxygen_generator_rating as u32 * c02_scrubber_rating as u32;
+
+    println!(
+        "Oxygen generator rating: {}, C02 scrubber rating: {}, Life support rating: {}",
+        oxygen_generator_rating, c02_scrubber_rating, life_support_rating
+    );
 }
 
 /// Parse the given input to commands.
@@ -53,13 +62,13 @@ fn determine_most_common_bit(values: &Vec<u16>, position: usize) -> u16 {
 ///
 /// Gamma takes the most common bit and is the first value.
 /// Epsilon takes the least common bit and is the second value.
-fn determine_gamma_and_eplison(values: Vec<u16>, length: usize) -> (u16, u16) {
+fn determine_gamma_and_eplison(values: &Vec<u16>, length: usize) -> (u16, u16) {
     let mut gamma: u16 = 0;
     let mut epsilon: u16 = 0;
 
     for i in 0..length {
         // Determine the bit values
-        let (gamma_bit, epsilon_bit): (u16, u16) = if determine_most_common_bit(&values, i) == 1 {
+        let (gamma_bit, epsilon_bit): (u16, u16) = if determine_most_common_bit(values, i) == 1 {
             (1, 0)
         } else {
             (0, 1)
@@ -108,7 +117,7 @@ fn determine_co2_scrubber_rating(values: Vec<u16>, length: usize) -> u16 {
             })
             .map(|value| *value)
             .collect();
-        
+
         // If all values have the same bit we want to keep them
         if new_values.len() > 0 {
             values = new_values;
@@ -169,7 +178,7 @@ mod test {
     fn should_determine_gamma_and_epsilon() {
         let values = vec![4, 30, 22, 23, 21, 15, 7, 28, 16, 25, 2, 10];
         let expected = (22, 9);
-        let actual = determine_gamma_and_eplison(values, 5);
+        let actual = determine_gamma_and_eplison(&values, 5);
 
         assert_eq!(actual, expected);
     }
