@@ -1,5 +1,15 @@
+use std::fs;
+
 fn main() {
-    println!("Hello, world!");
+    // Read the input file
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let values = parse_value_list(input);
+    let (gamma, epsilon) = determine_gamma_and_eplison(values, 12);
+    let power_consumption = gamma as u32 * epsilon as u32;
+
+    println!("The power consumption is {}", power_consumption);
 }
 
 /// Parse the given input to commands.
