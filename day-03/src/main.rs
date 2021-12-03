@@ -19,9 +19,40 @@ fn parse_value_list(input: String) -> Vec<u16> {
         .collect()
 }
 
+/// Determine the gamma value from 
+/// 
+/// Gamma takes the most common bit and is the first value.
+/// Epsilon takes the least common bit and is the second value.
+fn determine_gamma_and_eplison(values: Vec<u16>, length: usize) -> (u16, u16) {
+    let mut gamma: u16 = 0;
+    let mut epsilon: u16 = 0;
+
+    let majority = values.len() as u16 / 2;
+
+    for i in 0..length {
+        let one_count: u16 = values.iter().map(|value| {
+            let bit = (value >> i) & 1;
+            bit
+        }).sum();
+
+        // Determine the bit values
+        let (gamma_bit, epsilon_bit): (u16, u16) = if one_count >= majority {
+            (1, 0)
+        } else {
+            (0, 1)
+        };
+
+        // Add the bits to the numbers
+        gamma += gamma_bit << i;
+        epsilon += epsilon_bit << i;
+    }
+
+    (gamma, epsilon)
+}
+
 #[cfg(test)]
 mod test {
-    use crate::parse_value_list;
+    use crate::{parse_value_list, determine_gamma_and_eplison};
 
     #[test]
     fn should_parse_value_list() {
@@ -30,6 +61,15 @@ mod test {
                 .to_string();
         let expected = vec![4, 30, 22, 23, 21, 15, 7, 28, 16, 25, 2, 10];
         let actual = parse_value_list(input);
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_gamma_and_epsilon() {
+        let values = vec![4, 30, 22, 23, 21, 15, 7, 28, 16, 25, 2, 10];
+        let expected = (22, 9);
+        let actual = determine_gamma_and_eplison(values, 5);
 
         assert_eq!(actual, expected);
     }
