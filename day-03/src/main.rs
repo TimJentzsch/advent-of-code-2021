@@ -100,7 +100,7 @@ fn determine_co2_scrubber_rating(values: Vec<u16>, length: usize) -> u16 {
     for i in (0..length).rev() {
         let most_common_bit = determine_most_common_bit(&values, i);
 
-        values = values
+        let new_values: Vec<u16> = values
             .iter()
             .filter(|value| {
                 let bit = get_bit_at_position(**value, i);
@@ -108,8 +108,11 @@ fn determine_co2_scrubber_rating(values: Vec<u16>, length: usize) -> u16 {
             })
             .map(|value| *value)
             .collect();
-
-        println!("MCB: {}, Len: {}", most_common_bit, values.len());
+        
+        // If all values have the same bit we want to keep them
+        if new_values.len() > 0 {
+            values = new_values;
+        }
     }
 
     *values.first().unwrap()
@@ -183,8 +186,8 @@ mod test {
     #[test]
     fn should_determine_c02_scrubber_rating() {
         let values = vec![4, 30, 22, 23, 21, 15, 7, 28, 16, 25, 2, 10];
-        let expected = 23;
-        let actual = determine_co2_scrubber_rating(values, 10);
+        let expected = 10;
+        let actual = determine_co2_scrubber_rating(values, 5);
 
         assert_eq!(actual, expected);
     }
