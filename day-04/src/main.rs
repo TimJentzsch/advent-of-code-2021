@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq)]
+use std::fs;
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 struct Board<const R: usize, const C: usize> {
     /// The values of the bingo board.
     values: [[u16; R]; C],
@@ -94,10 +96,53 @@ impl<const R: usize, const C: usize> Board<{ R }, { C }> {
 
         false
     }
+
+    /// The sum of all unmarked numbers.
+    fn board_score(&self) -> u32 {
+        let mut score: u32 = 0;
+
+        for row in 0..R {
+            for col in 0..C {
+                if !self.mask[row][col] {
+                    score += self.values[row][col] as u32;
+                }
+            }
+        }
+
+        score
+    }
 }
 
 fn main() {
-    println!("Hello, world!");
+    // Read the input file
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let (numbers, mut boards) = parse_input(input);
+    let boards = &mut boards;
+
+    let mut winner: Option<(Board<5, 5>, u16)> = None;
+
+    // Draw the numbers and mark them on the board
+    'outer: for num in numbers {
+        for board in &mut *boards {
+            board.mark(num);
+
+            if board.has_won() {
+                // A board has one, stop the game
+                winner = Some((board.clone(), num));
+                break 'outer;
+            }
+        }
+    }
+
+    if let Some((winner_board, winner_num)) = winner {
+        // Calculate the final score
+        let score = winner_board.board_score() * winner_num as u32;
+        println!("The final score is {}!", score);
+    } else {
+        println!("There was no winner!");
+    }
 }
 
 /// Parse the given bingo numbers.
