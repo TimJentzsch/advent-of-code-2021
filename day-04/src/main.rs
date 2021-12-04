@@ -121,25 +121,34 @@ fn main() {
     let (numbers, mut boards) = parse_input(input);
     let boards = &mut boards;
 
-    let mut winner: Option<(Board<5, 5>, u16)> = None;
+    let mut winners: Vec<(Board<5, 5>, u32)> = vec![];
 
     // Draw the numbers and mark them on the board
-    'outer: for num in numbers {
+    for num in numbers {
         for board in &mut *boards {
-            board.mark(num);
+            if !board.has_won() {
+                board.mark(num);
 
-            if board.has_won() {
-                // A board has one, stop the game
-                winner = Some((board.clone(), num));
-                break 'outer;
+                if board.has_won() {
+                    // A board has one, add it to the winners
+                    winners.push((board.clone(), num as u32));
+                }
             }
         }
     }
 
-    if let Some((winner_board, winner_num)) = winner {
-        // Calculate the final score
-        let score = winner_board.board_score() * winner_num as u32;
-        println!("The final score is {}!", score);
+    // The first winner
+    if let Some((winner_board, winner_num)) = winners.first() {
+        let score = winner_board.board_score() * *winner_num;
+        println!("The final score of the first winner is {}!", score);
+    } else {
+        println!("There was no winner!");
+    }
+
+    // The last winner
+    if let Some((winner_board, winner_num)) = winners.last() {
+        let score = winner_board.board_score() * *winner_num;
+        println!("The final score of the last winner is {}!", score);
     } else {
         println!("There was no winner!");
     }
