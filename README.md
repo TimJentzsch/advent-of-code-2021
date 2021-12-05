@@ -8,3 +8,4 @@ I will use this event to improve my Rust knowledge.
 2. [Dive!](day-02)
 3. [Binary Diagnostic](day-03)
 4. [Giant Squid](day-04)
+5. [Hydrothermal Venture](day-05)
