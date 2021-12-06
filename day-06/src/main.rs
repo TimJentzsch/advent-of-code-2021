@@ -75,9 +75,14 @@ fn main() {
     let mut population = Population::from_input(input);
 
     population.simulate_days(80);
-    let count = population.fish_count();
+    let count_80_days = population.fish_count();
 
-    println!("There are {} fish after 80 days!", count);
+    println!("There are {} fish after 80 days!", count_80_days);
+
+    population.simulate_days(256 - 80);
+    let count_256_days = population.fish_count();
+
+    println!("There are {} fish after 256 days!", count_256_days);
 }
 
 #[cfg(test)]
