@@ -20,6 +20,20 @@ impl Population {
         population
     }
 
+    /// Create a new fish population from an input list of fish times.
+    fn from_input(input: String) -> Population {
+        let fish_list = input
+            .trim()
+            .split(",")
+            .into_iter()
+            .map(|fish_time_str| fish_time_str.parse::<usize>())
+            .filter(|res| res.is_ok())
+            .map(|res| res.unwrap())
+            .collect();
+
+        Population::from_fish_list(fish_list)
+    }
+
     /// Simulate the next day.
     fn next_day(&mut self) {
         let fishes_giving_birth = self.fishes[0];
@@ -36,7 +50,7 @@ impl Population {
     }
 
     /// Simulate the population for the given number of days.
-    /// 
+    ///
     /// Returns the fish population at the end.
     fn simulate_days(&mut self, days: usize) -> u128 {
         for _ in 0..days {
@@ -70,9 +84,17 @@ mod tests {
     }
 
     #[test]
+    fn should_create_from_input() {
+        let input = "3,4,3,1,2".to_string();
+        let expected = Population::new([0, 1, 1, 2, 1, 0, 0, 0, 0]);
+        let actual = Population::from_input(input);
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
     fn should_simulate_fish_population() {
-        // Population 3,4,3,1,2
-        let mut population = Population::new([0, 1, 1, 2, 1, 0, 0, 0, 0]);
+        let mut population = Population::from_input("3,4,3,1,2".into());
         let population_18_days = population.simulate_days(18);
         let population_80_days = population.simulate_days(80 - 18);
 
