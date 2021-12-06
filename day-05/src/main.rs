@@ -1,3 +1,5 @@
+use std::{fs, thread};
+
 #[derive(Debug, PartialEq)]
 struct ParseError(String);
 
@@ -194,8 +196,39 @@ impl<const R: usize, const C: usize> Diagram<R, C> {
     }
 }
 
+const STACK_SIZE: usize = 16 * 1024 * 1024;
+
 fn main() {
-    println!("Hello, world!");
+    // Run the code in a new thread to prevent stack overflows
+    let child = thread::Builder::new()
+        .stack_size(STACK_SIZE)
+        .spawn(run)
+        .unwrap();
+
+    // Wait for thread to join
+    child.join().unwrap();
+}
+
+fn run() {
+    // Read the input file
+    println!("Starting");
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let lines = parse_input(input);
+    println!("Creating diagram");
+    let mut diagram = Box::new(Diagram::<1000, 1000>::new());
+    println!("Diagram created");
+
+    // Draw in all horizontal or vertical lines
+    for line in lines {
+        if line.is_horizontal() || line.is_vertical() {
+            diagram.add_line(line);
+        }
+    }
+
+    let count = diagram.count_points(2);
+    println!("At least two lines overlap at {} points!", count);
 }
 
 fn parse_input(input: String) -> Vec<Line> {
