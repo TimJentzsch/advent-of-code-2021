@@ -89,6 +89,16 @@ impl Line {
 
         Ok(Line { start, end })
     }
+
+    /// Determines if the line is horizontal.
+    fn is_horizontal(&self) -> bool {
+        self.start.y == self.end.y
+    }
+
+    /// Determines if the line is vertical.
+    fn is_vertical(&self) -> bool {
+        self.start.x == self.end.x
+    }
 }
 
 fn main() {
@@ -115,5 +125,37 @@ mod test {
         let actual = Line::from_input(input);
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_horizontal_line_true() {
+        let line = Line::new(Point::new(2, 4), Point::new(9, 4));
+        let actual = line.is_horizontal();
+
+        assert_eq!(actual, true);
+    }
+
+    #[test]
+    fn should_determine_horizontal_line_false() {
+        let line = Line::new(Point::new(3, 2), Point::new(1, 4));
+        let actual = line.is_horizontal();
+
+        assert_eq!(actual, false);
+    }
+
+    #[test]
+    fn should_determine_vertical_line_true() {
+        let line = Line::new(Point::new(2, 4), Point::new(2, 6));
+        let actual = line.is_vertical();
+
+        assert_eq!(actual, true);
+    }
+
+    #[test]
+    fn should_determine_vertical_line_false() {
+        let line = Line::new(Point::new(3, 4), Point::new(1, 4));
+        let actual = line.is_vertical();
+
+        assert_eq!(actual, false);
     }
 }
