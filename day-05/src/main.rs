@@ -260,9 +260,7 @@ fn run() {
 
     // Draw in all horizontal or vertical lines
     for line in lines {
-        if line.is_horizontal() || line.is_vertical() {
-            diagram.add_line(line);
-        }
+        diagram.add_line(line);
     }
 
     let count = diagram.count_points(2);
