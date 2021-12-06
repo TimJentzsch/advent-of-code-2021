@@ -106,7 +106,7 @@ impl Line {
     }
 
     /// Get the points on the given line.
-    /// 
+    ///
     /// Currently only works for vertical and horizontal lines.
     fn points(&self) -> Vec<Point> {
         let mut points = vec![];
@@ -138,7 +138,9 @@ struct Diagram<const R: usize, const C: usize> {
 impl<const R: usize, const C: usize> Diagram<R, C> {
     /// Create a new, empty diagram.
     fn new() -> Diagram<R, C> {
-        Diagram { values: [[0usize; R]; C]}
+        Diagram {
+            values: [[0usize; R]; C],
+        }
     }
 
     /// Add a point to the diagram.
@@ -151,6 +153,23 @@ impl<const R: usize, const C: usize> Diagram<R, C> {
         for point in line.points() {
             self.add_point(point);
         }
+    }
+
+    /// Count the number of points where their value exceeds the threshold.
+    ///
+    /// This means lines overlap at that many points.
+    fn count_points(&self, threshold: usize) -> usize {
+        let mut count = 0;
+
+        for row in 0..R {
+            for col in 0..C {
+                if self.values[row][col] >= threshold {
+                    count += 1;
+                }
+            }
+        }
+
+        count
     }
 
     /// Create a string from the diagram.
@@ -181,7 +200,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{Point, Line, Diagram};
+    use crate::{Diagram, Line, Point};
 
     #[test]
     fn should_parse_point_from_input() {
@@ -255,35 +274,38 @@ mod test {
     fn should_add_point_to_diagram() {
         let point = Point::new(1, 2);
         let expected = Diagram {
-            values: [
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 1, 0],
-            ],
+            values: [[0, 0, 0], [0, 0, 0], [0, 1, 0]],
         };
-        
+
         let mut actual = Diagram::<3, 3>::new();
         actual.add_point(point);
 
         assert_eq!(actual, expected);
     }
 
-    
-
     #[test]
     fn should_add_line_to_diagram() {
         let line = Line::new(Point::new(1, 2), Point::new(1, 0));
         let expected = Diagram {
-            values: [
-                [0, 1, 0],
-                [0, 1, 0],
-                [0, 1, 0],
-            ],
+            values: [[0, 1, 0], [0, 1, 0], [0, 1, 0]],
         };
-        
+
         let mut actual = Diagram::<3, 3>::new();
         actual.add_line(line);
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_count_diagram_points() {
+        let line1 = Line::new(Point::new(1, 2), Point::new(1, 0));
+        let line2 = Line::new(Point::new(1, 1), Point::new(2, 1));
+        let mut diagram = Diagram::<3, 3>::new();
+        diagram.add_line(line1);
+        diagram.add_line(line2);
+        
+        let actual = diagram.count_points(2);
+
+        assert_eq!(actual, 1);
     }
 }
