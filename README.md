@@ -9,3 +9,4 @@ I will use this event to improve my Rust knowledge.
 3. [Binary Diagnostic](day-03)
 4. [Giant Squid](day-04)
 5. [Hydrothermal Venture](day-05)
+6. [Lanternfish](day-06)
