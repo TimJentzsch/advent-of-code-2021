@@ -44,6 +44,11 @@ impl Point {
 
         Ok(Point { x, y })
     }
+
+    /// Format the point to a string.
+    fn stringify(&self) -> String {
+        format!("{},{}", self.x, self.y)
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -98,6 +103,11 @@ impl Line {
     /// Determines if the line is vertical.
     fn is_vertical(&self) -> bool {
         self.start.x == self.end.x
+    }
+
+    /// Format the line to a string.
+    fn stringify(&self) -> String {
+        format!("{} -> {}", self.start.stringify(), self.end.stringify())
     }
 }
 
