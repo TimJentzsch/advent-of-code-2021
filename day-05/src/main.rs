@@ -97,6 +97,22 @@ impl Line {
         Ok(Line { start, end })
     }
 
+    fn max_x(&self) -> usize {
+        self.start.x.max(self.end.x)
+    }
+
+    fn max_y(&self) -> usize {
+        self.start.y.max(self.end.y)
+    }
+
+    fn min_x(&self) -> usize {
+        self.start.x.min(self.end.x)
+    }
+
+    fn min_y(&self) -> usize {
+        self.start.y.min(self.end.y)
+    }
+
     /// Determines if the line is horizontal.
     fn is_horizontal(&self) -> bool {
         self.start.y == self.end.y
@@ -107,6 +123,11 @@ impl Line {
         self.start.x == self.end.x
     }
 
+    /// Determines if the line is diagonal.
+    fn is_diagonal(&self) -> bool {
+        (self.max_x() - self.min_x()) == (self.max_y() - self.min_y())
+    }
+
     /// Get the points on the given line.
     ///
     /// Currently only works for vertical and horizontal lines.
@@ -114,11 +135,11 @@ impl Line {
         let mut points = vec![];
 
         if self.is_vertical() {
-            for y in self.start.y.min(self.end.y)..(self.start.y.max(self.end.y) + 1) {
+            for y in self.min_y()..(self.max_y() + 1) {
                 points.push(Point::new(self.start.x, y));
             }
         } else if self.is_horizontal() {
-            for x in self.start.x.min(self.end.x)..(self.start.x.max(self.end.x) + 1) {
+            for x in self.min_x()..(self.max_x() + 1) {
                 points.push(Point::new(x, self.start.y));
             }
         }
@@ -297,6 +318,22 @@ mod test {
     fn should_determine_vertical_line_false() {
         let line = Line::new(Point::new(3, 4), Point::new(1, 4));
         let actual = line.is_vertical();
+
+        assert_eq!(actual, false);
+    }
+
+    #[test]
+    fn should_determine_diagonal_line_true() {
+        let line = Line::new(Point::new(9, 7), Point::new(7, 9));
+        let actual = line.is_diagonal();
+
+        assert_eq!(actual, true);
+    }
+
+    #[test]
+    fn should_determine_diagonal_line_false() {
+        let line = Line::new(Point::new(3, 4), Point::new(1, 4));
+        let actual = line.is_diagonal();
 
         assert_eq!(actual, false);
     }
