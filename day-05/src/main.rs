@@ -130,17 +130,34 @@ impl Line {
 
     /// Get the points on the given line.
     ///
-    /// Currently only works for vertical and horizontal lines.
+    /// Currently only works for horizontal, vertical and diagonal lines.
     fn points(&self) -> Vec<Point> {
         let mut points = vec![];
 
-        if self.is_vertical() {
+        if self.is_horizontal() {
+            for x in self.min_x()..(self.max_x() + 1) {
+                points.push(Point::new(x, self.start.y));
+            }
+        } else if self.is_vertical() {
             for y in self.min_y()..(self.max_y() + 1) {
                 points.push(Point::new(self.start.x, y));
             }
-        } else if self.is_horizontal() {
-            for x in self.min_x()..(self.max_x() + 1) {
-                points.push(Point::new(x, self.start.y));
+        } else if self.is_diagonal() {
+            for d in 0..(self.max_x() - self.min_x() + 1) {
+                let dx: isize = if self.start.x <= self.end.x {
+                    d as isize
+                } else {
+                    -(d as isize)
+                };
+                let dy: isize = if self.start.y <= self.end.y {
+                    d as isize
+                } else {
+                    -(d as isize)
+                };
+                points.push(Point::new(
+                    ((self.start.x as isize) + dx) as usize,
+                    ((self.start.y as isize) + dy) as usize,
+                ));
             }
         }
 
@@ -270,7 +287,7 @@ fn parse_input(input: String) -> Vec<Line> {
 
 #[cfg(test)]
 mod test {
-    use crate::{Diagram, Line, Point, parse_input};
+    use crate::{parse_input, Diagram, Line, Point};
 
     #[test]
     fn should_parse_point_from_input() {
@@ -351,6 +368,15 @@ mod test {
     fn should_determine_points_on_vertical_line() {
         let line = Line::new(Point::new(1, 1), Point::new(1, 3));
         let expected = vec![Point::new(1, 1), Point::new(1, 2), Point::new(1, 3)];
+        let actual = line.points();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_points_on_diagonal_line() {
+        let line = Line::new(Point::new(9, 7), Point::new(7, 9));
+        let expected = vec![Point::new(9, 7), Point::new(8, 8), Point::new(7, 9)];
         let actual = line.points();
 
         assert_eq!(actual, expected);
