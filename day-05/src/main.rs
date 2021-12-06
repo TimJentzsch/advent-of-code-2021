@@ -3,12 +3,12 @@ struct ParseError(String);
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 struct Point {
-    x: u32,
-    y: u32,
+    x: usize,
+    y: usize,
 }
 
 impl Point {
-    fn new(x: u32, y: u32) -> Point {
+    fn new(x: usize, y: usize) -> Point {
         Point { x, y }
     }
 
@@ -21,7 +21,7 @@ impl Point {
         let mut parts = input.split(",").into_iter();
 
         // Parse x
-        let x: u32 = if let Some(x_part) = parts.next() {
+        let x: usize = if let Some(x_part) = parts.next() {
             if let Ok(x) = x_part.parse() {
                 x
             } else {
@@ -32,7 +32,7 @@ impl Point {
         };
 
         // Parse y
-        let y: u32 = if let Some(y_part) = parts.next() {
+        let y: usize = if let Some(y_part) = parts.next() {
             if let Ok(x) = y_part.parse() {
                 x
             } else {
@@ -130,13 +130,37 @@ impl Line {
     }
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+struct Diagram<const R: usize, const C: usize> {
+    values: [[usize; R]; C],
+}
+
+impl<const R: usize, const C: usize> Diagram<R, C> {
+    /// Create a new, empty diagram.
+    fn new() -> Diagram<R, C> {
+        Diagram { values: [[0usize; R]; C]}
+    }
+
+    /// Add a point to the diagram.
+    fn add_point(&mut self, point: Point) {
+        self.values[point.y][point.x] += 1;
+    }
+
+    /// Add a line to the diagram.
+    fn add_line(&mut self, line: Line) {
+        for point in line.points() {
+            self.add_point(point);
+        }
+    }
+}
+
 fn main() {
     println!("Hello, world!");
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{Point, Line};
+    use crate::{Point, Line, Diagram};
 
     #[test]
     fn should_parse_point_from_input() {
@@ -202,6 +226,42 @@ mod test {
         let line = Line::new(Point::new(1, 1), Point::new(1, 3));
         let expected = vec![Point::new(1, 1), Point::new(1, 2), Point::new(1, 3)];
         let actual = line.points();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_add_point_to_diagram() {
+        let point = Point::new(1, 2);
+        let expected = Diagram {
+            values: [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 1, 0],
+            ],
+        };
+        
+        let mut actual = Diagram::<3, 3>::new();
+        actual.add_point(point);
+
+        assert_eq!(actual, expected);
+    }
+
+    
+
+    #[test]
+    fn should_add_line_to_diagram() {
+        let line = Line::new(Point::new(1, 2), Point::new(1, 0));
+        let expected = Diagram {
+            values: [
+                [0, 1, 0],
+                [0, 1, 0],
+                [0, 1, 0],
+            ],
+        };
+        
+        let mut actual = Diagram::<3, 3>::new();
+        actual.add_line(line);
 
         assert_eq!(actual, expected);
     }
