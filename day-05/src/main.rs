@@ -152,6 +152,27 @@ impl<const R: usize, const C: usize> Diagram<R, C> {
             self.add_point(point);
         }
     }
+
+    /// Create a string from the diagram.
+    fn stringify(&self) -> String {
+        let mut output = "".to_string();
+
+        for row in 0..R {
+            for col in 0..C {
+                let value = self.values[row][col];
+
+                if value == 0 {
+                    output += ".";
+                } else {
+                    output += &value.to_string();
+                }
+            }
+
+            output += "\n";
+        }
+
+        output
+    }
 }
 
 fn main() {
