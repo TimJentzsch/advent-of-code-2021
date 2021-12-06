@@ -198,9 +198,25 @@ fn main() {
     println!("Hello, world!");
 }
 
+fn parse_input(input: String) -> Vec<Line> {
+    let line_strs = input.split("\n").into_iter();
+
+    line_strs
+        // Parse the line
+        .map(|line_str| Line::from_input(line_str.to_string()))
+        // Filter out invalid lines
+        .filter(|res| match res {
+            Ok(_) => true,
+            Err(_) => false,
+        })
+        // Extract the result
+        .map(|res| res.unwrap())
+        .collect()
+}
+
 #[cfg(test)]
 mod test {
-    use crate::{Diagram, Line, Point};
+    use crate::{Diagram, Line, Point, parse_input};
 
     #[test]
     fn should_parse_point_from_input() {
@@ -303,9 +319,21 @@ mod test {
         let mut diagram = Diagram::<3, 3>::new();
         diagram.add_line(line1);
         diagram.add_line(line2);
-        
+
         let actual = diagram.count_points(2);
 
         assert_eq!(actual, 1);
+    }
+
+    #[test]
+    fn should_parse_input_lines() {
+        let input = "0,9 -> 5,9\n8,0 -> 0,8\n".to_string();
+        let expected = vec![
+            Line::new(Point::new(0, 9), Point::new(5, 9)),
+            Line::new(Point::new(8, 0), Point::new(0, 8)),
+        ];
+        let actual = parse_input(input);
+
+        assert_eq!(actual, expected);
     }
 }
