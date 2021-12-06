@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq, Clone, Copy)]
 struct Population {
     fishes: [u128; 9],
 }
@@ -6,6 +7,17 @@ impl Population {
     /// Create a new fish population.
     fn new(fishes: [u128; 9]) -> Population {
         Population { fishes }
+    }
+
+    /// Create a new fish population from a list of fish.
+    fn from_fish_list(fish_list: Vec<usize>) -> Population {
+        let mut population = Population::new([0u128; 9]);
+
+        for fish_time in fish_list {
+            population.fishes[fish_time] += 1;
+        }
+
+        population
     }
 
     /// Simulate the next day.
@@ -47,6 +59,15 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use crate::Population;
+    #[test]
+    fn should_create_from_fish_list() {
+        // Population 3,4,3,1,2
+        let fish_list = vec![3, 4, 3, 1, 2];
+        let expected = Population::new([0, 1, 1, 2, 1, 0, 0, 0, 0]);
+        let actual = Population::from_fish_list(fish_list);
+
+        assert_eq!(actual, expected);
+    }
 
     #[test]
     fn should_simulate_fish_population() {
