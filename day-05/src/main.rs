@@ -105,6 +105,25 @@ impl Line {
         self.start.x == self.end.x
     }
 
+    /// Get the points on the given line.
+    /// 
+    /// Currently only works for vertical and horizontal lines.
+    fn points(&self) -> Vec<Point> {
+        let mut points = vec![];
+
+        if self.is_vertical() {
+            for y in self.start.y.min(self.end.y)..(self.start.y.max(self.end.y) + 1) {
+                points.push(Point::new(self.start.x, y));
+            }
+        } else if self.is_horizontal() {
+            for x in self.start.x.min(self.end.x)..(self.start.x.max(self.end.x) + 1) {
+                points.push(Point::new(x, self.start.y));
+            }
+        }
+
+        points
+    }
+
     /// Format the line to a string.
     fn stringify(&self) -> String {
         format!("{} -> {}", self.start.stringify(), self.end.stringify())
@@ -167,5 +186,23 @@ mod test {
         let actual = line.is_vertical();
 
         assert_eq!(actual, false);
+    }
+
+    #[test]
+    fn should_determine_points_on_horizontal_line() {
+        let line = Line::new(Point::new(9, 7), Point::new(7, 7));
+        let expected = vec![Point::new(7, 7), Point::new(8, 7), Point::new(9, 7)];
+        let actual = line.points();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_points_on_vertical_line() {
+        let line = Line::new(Point::new(1, 1), Point::new(1, 3));
+        let expected = vec![Point::new(1, 1), Point::new(1, 2), Point::new(1, 3)];
+        let actual = line.points();
+
+        assert_eq!(actual, expected);
     }
 }
