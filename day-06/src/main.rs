@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 struct Population {
     fishes: [u128; 9],
@@ -67,7 +69,15 @@ impl Population {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let mut population = Population::from_input(input);
+
+    population.simulate_days(80);
+    let count = population.fish_count();
+
+    println!("There are {} fish after 80 days!", count);
 }
 
 #[cfg(test)]
@@ -94,7 +104,7 @@ mod tests {
 
     #[test]
     fn should_simulate_fish_population() {
-        let mut population = Population::from_input("3,4,3,1,2".into());
+        let mut population = Population::from_input("3,4,3,1,2\n".into());
         let population_18_days = population.simulate_days(18);
         let population_80_days = population.simulate_days(80 - 18);
 
