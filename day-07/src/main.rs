@@ -1,5 +1,13 @@
+use std::fs;
+
 fn main() {
-    println!("Hello, world!");
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let crabs = parse_input(input);
+    let (optimal_pos, fuel_cost) = determine_optimal_position(&crabs);
+
+    println!("The optimal position is {optimal_pos} with a cost of {fuel_cost} fuel.");
 }
 
 /// Parse the list of crab positions
