@@ -32,7 +32,12 @@ fn determine_optimal_position(crabs: &Vec<i32>) -> (i32, i32) {
     for pos in *min..(*max + 1) {
         let cur_fuel_cost: i32 = crabs
             .into_iter()
-            .map(|crab_pos| (crab_pos - pos).abs())
+            .map(|crab_pos| {
+                let distance = (crab_pos - pos).abs();
+                // Sum of all integers in that range
+                let cost = (distance * (distance + 1)) / 2;
+                cost
+            })
             .sum();
 
         if cur_fuel_cost < fuel_cost {
@@ -60,7 +65,7 @@ mod tests {
     #[test]
     fn should_determine_optimal_position() {
         let crabs = vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
-        let (expected_pos, expected_fuel) = (2, 37);
+        let (expected_pos, expected_fuel) = (5, 168);
         let (actual_pos, actual_fuel) = determine_optimal_position(&crabs);
 
         assert_eq!(actual_pos, expected_pos);
