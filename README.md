@@ -11,3 +11,4 @@ I will use this event to improve my Rust knowledge.
 5. [Hydrothermal Venture](day-05)
 6. [Lanternfish](day-06)
 7. [The Treachery of Whales](day-07)
+8. [Seven Segment Search](day-08)
