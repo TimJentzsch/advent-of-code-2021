@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(Debug)]
 struct InvalidSegment;
 
@@ -42,7 +44,8 @@ impl Digit for u8 {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
 }
 
 /// Parse a list of digits.
