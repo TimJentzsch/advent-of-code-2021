@@ -9,6 +9,7 @@ trait Digit {
     where
         Self: Sized;
     fn segment_count(&self) -> u8;
+    fn remap(&self, map: &[u8; 7]) -> Self;
     fn value(&self) -> u8;
 }
 
@@ -41,6 +42,18 @@ impl Digit for u8 {
     /// Count the number of activated segments
     fn segment_count(&self) -> u8 {
         (0..8).into_iter().map(|index| (self >> index) & 1).sum()
+    }
+
+    /// Remap the segments.
+    fn remap(&self, map: &[u8; 7]) -> Self {
+        let mut remapped_digit = 0u8;
+
+        for index in 0..7 {
+            let bit = (self >> index) & 1;
+            remapped_digit += bit << map[index];
+        }
+
+        remapped_digit
     }
 
     /// The decimal value of the digit.
