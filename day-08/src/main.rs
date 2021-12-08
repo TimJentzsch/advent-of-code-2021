@@ -46,6 +46,20 @@ impl Digit for u8 {
 fn main() {
     let filename = "./input/input.txt";
     let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let lines = parse_input(input);
+
+    let mut unique_digit_count = 0;
+
+    for (_, output_digits) in lines {
+        unique_digit_count += output_digits
+            .into_iter()
+            .map(|digit| digit.segment_count())
+            .filter(|count| *count == 2 || *count == 3 || *count == 4 || *count == 7)
+            .count();
+    }
+
+    println!("Number of unique output digits: {}", unique_digit_count);
 }
 
 /// Parse a list of digits.
@@ -75,9 +89,19 @@ fn parse_input_line(input: String) -> (Vec<u8>, Vec<u8>) {
     (input, output)
 }
 
+/// Parse the input file.
+fn parse_input(input: String) -> Vec<(Vec<u8>, Vec<u8>)> {
+    input
+        .trim()
+        .split("\n")
+        .into_iter()
+        .map(|line| parse_input_line(line.to_string()))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::{Digit, parse_digit_list};
+    use crate::{parse_digit_list, Digit};
 
     #[test]
     fn should_count_active_segments() {
