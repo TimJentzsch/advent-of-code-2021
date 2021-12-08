@@ -9,6 +9,7 @@ trait Digit {
     where
         Self: Sized;
     fn segment_count(&self) -> u8;
+    fn value(&self) -> u8;
 }
 
 impl Digit for u8 {
@@ -40,6 +41,24 @@ impl Digit for u8 {
     /// Count the number of activated segments
     fn segment_count(&self) -> u8 {
         (0..8).into_iter().map(|index| (self >> index) & 1).sum()
+    }
+
+    /// The decimal value of the digit.
+    /// Only works after it has been converted to the default format.
+    fn value(&self) -> u8 {
+        match self {
+            0b1110111 => 0,
+            0b0010010 => 1,
+            0b1011101 => 2,
+            0b1011011 => 3,
+            0b0111010 => 4,
+            0b1101011 => 5,
+            0b1101111 => 6,
+            0b1010010 => 7,
+            0b1111111 => 8,
+            0b1111011 => 9,
+            _ => panic!("Invalid digit value!"),
+        }
     }
 }
 
