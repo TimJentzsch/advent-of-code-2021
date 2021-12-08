@@ -45,9 +45,36 @@ fn main() {
     println!("Hello, world!");
 }
 
+/// Parse a list of digits.
+///
+/// Example input:
+///
+/// `eacfd acdfbe cbdegf fcbaedg`
+fn parse_digit_list(input: String) -> Vec<u8> {
+    input
+        .split(" ")
+        .into_iter()
+        .map(|segments| u8::from_input(segments.to_string()))
+        .collect()
+}
+
+/// Parse one line of input to the input and output digits.
+///
+/// Example input:
+///
+/// `badc bd dbeaf cfdbge dfb cfbdea efbag edcfgab dcafe degfca | eacfd acdfbe cbdegf fcbaedg`
+fn parse_input_line(input: String) -> (Vec<u8>, Vec<u8>) {
+    let mut parts = input.trim().split(" | ");
+
+    let input = parse_digit_list(parts.next().unwrap().to_string());
+    let output = parse_digit_list(parts.next().unwrap().to_string());
+
+    (input, output)
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::Digit;
+    use crate::{Digit, parse_digit_list};
 
     #[test]
     fn should_count_active_segments() {
@@ -62,6 +89,15 @@ mod tests {
         let input = "abdfg".to_string();
         let expected: u8 = 0b1101011;
         let actual = u8::from_input(input);
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_parse_digit_list() {
+        let input = "eacfd acdfbe cbdegf fcbaedg".to_string();
+        let expected: Vec<u8> = vec![0b1011110, 0b1111110, 0b0111111, 0b1111111];
+        let actual = parse_digit_list(input);
 
         assert_eq!(actual, expected);
     }
