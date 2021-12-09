@@ -127,6 +127,12 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
     fn basin_sizes(&self) -> Vec<usize> {
         self.basins().into_iter().map(|basin| basin.len()).collect()
     }
+
+    fn biggest_basin_sizes(&self) -> usize {
+        let mut sizes = self.basin_sizes();
+        sizes.sort();
+        sizes.into_iter().rev().take(3).product()
+    }
 }
 
 fn main() {
@@ -223,6 +229,24 @@ mod tests {
         let expected = vec![3, 9, 14, 9];
 
         let actual = heightmap.basin_sizes();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_biggest_basin_sizes() {
+        let heightmap = Heightmap {
+            heights: [
+                [2, 1, 9, 9, 9, 4, 3, 2, 1, 0],
+                [3, 9, 8, 7, 8, 9, 4, 9, 2, 1],
+                [9, 8, 5, 6, 7, 8, 9, 8, 9, 2],
+                [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
+                [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
+            ],
+        };
+        let expected = 1134;
+
+        let actual = heightmap.biggest_basin_sizes();
 
         assert_eq!(actual, expected);
     }
