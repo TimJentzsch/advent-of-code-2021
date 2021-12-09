@@ -83,16 +83,21 @@ fn main() {
     let lines = parse_input(input);
 
     let mut unique_digit_count = 0;
+    let mut value_sum = 0;
 
-    for (_, output_digits) in lines {
-        unique_digit_count += output_digits
+    for (input_digits, output_digits) in lines {
+        unique_digit_count += (&output_digits)
             .into_iter()
             .map(|digit| digit.segment_count())
             .filter(|count| *count == 2 || *count == 3 || *count == 4 || *count == 7)
             .count();
+        
+        let value = calculate_output_value(input_digits, output_digits);
+        value_sum += value;
     }
 
     println!("Number of unique output digits: {}", unique_digit_count);
+    println!("Value sum: {}", value_sum);
 }
 
 /// Parse a list of digits.
@@ -144,8 +149,7 @@ fn find_digit_with_count(digits: &Vec<u8>, count: u8) -> u8 {
     *filter_digits_with_count(digits, count).first().unwrap()
 }
 
-fn calculate_output_value(input: String) -> u64 {
-    let (input_digits, output_digits) = parse_input_line(input);
+fn calculate_output_value(input_digits: Vec<u8>, output_digits: Vec<u8>) -> u64 {
     let mapping = determine_mapping(input_digits);
 
     let mut value = 0;
@@ -153,9 +157,7 @@ fn calculate_output_value(input: String) -> u64 {
     for i in 0..4 {
         let original_digit = output_digits[i];
         let remapped_digit = original_digit.remap(&mapping);
-        println!("Original: {:#07b}, remapped: {:#07b}", original_digit, remapped_digit);
         let digit_value = remapped_digit.value() as u64;
-        println!("Original: {:#07b}, remapped: {:#07b}, value: {:#07b}", original_digit, remapped_digit, digit_value);
         value += digit_value * 10u64.pow((3 - i).try_into().unwrap());
     }
 
@@ -200,7 +202,7 @@ fn determine_mapping(digits: Vec<u8>) -> [u8; 7] {
         .filter(|&digit| digit & f == 0)
         .next()
         .unwrap();
-    
+
     let b = abcdefg - acdeg - f;
     let d = bcdf - cf - b;
 
@@ -212,7 +214,7 @@ fn determine_mapping(digits: Vec<u8>) -> [u8; 7] {
 
 #[cfg(test)]
 mod tests {
-    use crate::{parse_digit_list, Digit, calculate_output_value, determine_mapping};
+    use crate::{calculate_output_value, determine_mapping, parse_digit_list, Digit, parse_input_line};
 
     #[test]
     fn should_count_active_segments() {
@@ -244,7 +246,9 @@ mod tests {
     fn should_determine_mapping() {
         let input = "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab".to_string();
         let input_digits = parse_digit_list(input);
-        let expected = [0b0001000, 0b0000100, 0b1000000, 0b0000010, 0b0000001, 0b0100000, 0b0010000];
+        let expected = [
+            0b0001000, 0b0000100, 0b1000000, 0b0000010, 0b0000001, 0b0100000, 0b0010000,
+        ];
         let actual = determine_mapping(input_digits);
 
         assert_eq!(actual, expected);
@@ -254,9 +258,11 @@ mod tests {
     fn should_remap_value() {
         let input = 0b1101010;
         // cgafedb -> abcdefg
-        let mapping = [0b0010000, 0b0000001, 0b1000000, 0b0000010, 0b0000100, 0b0001000, 0b0100000];
+        let mapping = [
+            0b0010000, 0b0000001, 0b1000000, 0b0000010, 0b0000100, 0b0001000, 0b0100000,
+        ];
         let expected = 0b0011011;
-        
+
         let actual = input.remap(&mapping);
 
         assert_eq!(actual, expected);
@@ -264,9 +270,12 @@ mod tests {
 
     #[test]
     fn should_calculate_output_value() {
-        let input = "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf".to_string();
+        let input =
+            "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"
+                .to_string();
+        let (input_digits, output_digits) = parse_input_line(input);
         let expected = 5353u64;
-        let actual = calculate_output_value(input);
+        let actual = calculate_output_value(input_digits, output_digits);
 
         assert_eq!(actual, expected);
     }
