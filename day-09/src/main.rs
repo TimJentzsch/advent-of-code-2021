@@ -42,7 +42,6 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
                             break;
                         }
                     }
-                    
                 }
 
                 if is_low_point {
@@ -52,6 +51,13 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
         }
 
         low_points
+    }
+
+    fn low_point_risk_value(&self) -> u32 {
+        self.low_points()
+            .into_iter()
+            .map(|height| (height + 1) as u32)
+            .sum()
     }
 }
 
@@ -102,6 +108,25 @@ mod tests {
         };
         let expected = vec![1, 0, 5, 5];
         let actual = heightmap.low_points();
+
+        assert_eq!(actual, expected);
+    }
+
+
+
+    #[test]
+    fn should_determine_low_point_risk_value() {
+        let heightmap = Heightmap {
+            heights: [
+                [2, 1, 9, 9, 9, 4, 3, 2, 1, 0],
+                [3, 9, 8, 7, 8, 9, 4, 9, 2, 1],
+                [9, 8, 5, 6, 7, 8, 9, 8, 9, 2],
+                [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
+                [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
+            ],
+        };
+        let expected = 15;
+        let actual = heightmap.low_point_risk_value();
 
         assert_eq!(actual, expected);
     }
