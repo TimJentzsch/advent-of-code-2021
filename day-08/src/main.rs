@@ -49,9 +49,8 @@ impl Digit for u8 {
         let mut remapped_digit = 0u8;
 
         for index in 0..7 {
-            let bit = (self >> (6-index)) & 1;
-            if bit == 1 {
-                remapped_digit += map[index];
+            if map[index] & self > 0 {
+                remapped_digit += 1 << (6 - index);
             }
         }
 
@@ -152,8 +151,11 @@ fn calculate_output_value(input: String) -> u64 {
     let mut value = 0;
 
     for i in 0..4 {
-        let digit_value = output_digits[i].remap(&mapping).value() as u64;
-        println!("Value: {}", digit_value);
+        let original_digit = output_digits[i];
+        let remapped_digit = original_digit.remap(&mapping);
+        println!("Original: {:#07b}, remapped: {:#07b}", original_digit, remapped_digit);
+        let digit_value = remapped_digit.value() as u64;
+        println!("Original: {:#07b}, remapped: {:#07b}, value: {:#07b}", original_digit, remapped_digit, digit_value);
         value += digit_value * 10u64.pow((3 - i).try_into().unwrap());
     }
 
@@ -210,7 +212,7 @@ fn determine_mapping(digits: Vec<u8>) -> [u8; 7] {
 
 #[cfg(test)]
 mod tests {
-    use crate::{parse_digit_list, Digit, calculate_output_value};
+    use crate::{parse_digit_list, Digit, calculate_output_value, determine_mapping};
 
     #[test]
     fn should_count_active_segments() {
@@ -234,6 +236,16 @@ mod tests {
         let input = "eacfd acdfbe cbdegf fcbaedg".to_string();
         let expected: Vec<u8> = vec![0b1011110, 0b1111110, 0b0111111, 0b1111111];
         let actual = parse_digit_list(input);
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_mapping() {
+        let input = "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab".to_string();
+        let input_digits = parse_digit_list(input);
+        let expected = [0b0001000, 0b0000100, 0b1000000, 0b0000010, 0b0000001, 0b0100000, 0b0010000];
+        let actual = determine_mapping(input_digits);
 
         assert_eq!(actual, expected);
     }
