@@ -1,6 +1,21 @@
 use std::fs;
 
 #[derive(Debug, PartialEq)]
+struct Point {
+    height: u8,
+    pos: (usize, usize),
+}
+
+impl Point {
+    fn new(value: u8, row: usize, column: usize) -> Self {
+        Self {
+            height: value,
+            pos: (row, column),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
 struct Heightmap<const R: usize, const C: usize> {
     heights: [[u8; C]; R],
 }
@@ -26,12 +41,12 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
         Heightmap { heights }
     }
 
-    fn low_points(&self) -> Vec<u8> {
+    fn low_points(&self) -> Vec<Point> {
         let mut low_points = vec![];
 
         for row in 0..R {
             for col in 0..C {
-                let value = self.heights[row][col];
+                let height = self.heights[row][col];
                 let mut is_low_point = true;
 
                 // Check if the adjacent values are all higher
@@ -39,7 +54,7 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
                     let (r_index, c_index) = (row as i32 + dr, col as i32 + dc);
 
                     if r_index >= 0 && r_index < R as i32 && c_index >= 0 && c_index < C as i32 {
-                        if self.heights[r_index as usize][c_index as usize] <= value {
+                        if self.heights[r_index as usize][c_index as usize] <= height {
                             is_low_point = false;
                             break;
                         }
@@ -47,7 +62,7 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
                 }
 
                 if is_low_point {
-                    low_points.push(value);
+                    low_points.push(Point::new(height, row, col));
                 }
             }
         }
@@ -58,8 +73,14 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
     fn low_point_risk_value(&self) -> u32 {
         self.low_points()
             .into_iter()
-            .map(|height| (height + 1) as u32)
+            .map(|point| (point.height + 1) as u32)
             .sum()
+    }
+
+    fn basins(&self) -> Vec<Vec<Point>> {
+        let low_points = self.low_points();
+
+        vec![]
     }
 }
 
@@ -76,7 +97,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::Heightmap;
+    use crate::{Heightmap, Point};
 
     #[test]
     fn should_parse_row() {
@@ -115,13 +136,16 @@ mod tests {
                 [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
             ],
         };
-        let expected = vec![1, 0, 5, 5];
+        let expected = vec![
+            Point::new(1, 0, 1),
+            Point::new(0, 0, 9),
+            Point::new(5, 2, 2),
+            Point::new(5, 4, 6),
+        ];
         let actual = heightmap.low_points();
 
         assert_eq!(actual, expected);
     }
-
-
 
     #[test]
     fn should_determine_low_point_risk_value() {
