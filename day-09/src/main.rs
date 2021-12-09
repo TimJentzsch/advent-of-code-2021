@@ -1,17 +1,15 @@
 use std::fs;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 struct Point {
     height: u8,
-    pos: (usize, usize),
+    row: usize,
+    col: usize,
 }
 
 impl Point {
-    fn new(value: u8, row: usize, column: usize) -> Self {
-        Self {
-            height: value,
-            pos: (row, column),
-        }
+    fn new(height: u8, row: usize, col: usize) -> Self {
+        Self { height, row, col }
     }
 }
 
@@ -39,6 +37,18 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
         }
 
         Heightmap { heights }
+    }
+
+    fn point(&self, row: i32, col: i32) -> Option<Point> {
+        if row >= 0 && row < R as i32 && col >= 0 && col < C as i32 {
+            Some(Point::new(
+                self.heights[row as usize][col as usize],
+                row as usize,
+                col as usize,
+            ))
+        } else {
+            None
+        }
     }
 
     fn low_points(&self) -> Vec<Point> {
@@ -80,7 +90,38 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
     fn basins(&self) -> Vec<Vec<Point>> {
         let low_points = self.low_points();
 
-        vec![]
+        low_points
+            .into_iter()
+            .map(|low_point| {
+                let mut basin_points: Vec<Point> = vec![];
+                let mut points_to_explore = vec![low_point.clone()];
+
+                while points_to_explore.len() > 0 {
+                    let mut new_points_to_explore: Vec<Point> = vec![];
+                    for &point in &points_to_explore {
+                        if !basin_points.contains(&point) && point.height != 9 {
+                            basin_points.push(point.clone());
+                        }
+
+                        for (dr, dc) in [(1, 0), (0, 1), (-1, 0), (0, -1)] {
+                            if let Some(point) =
+                                self.point(low_point.row as i32 + dr, low_point.col as i32 + dc)
+                            {
+                                if !basin_points.contains(&&&point)
+                                    && !new_points_to_explore.contains(&point)
+                                    && point.height != 9
+                                {
+                                    new_points_to_explore.push(point);
+                                }
+                            }
+                        }
+                    }
+                    points_to_explore = new_points_to_explore;
+                }
+
+                basin_points
+            })
+            .collect()
     }
 }
 
