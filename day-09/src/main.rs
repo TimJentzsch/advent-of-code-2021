@@ -94,34 +94,38 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
             .into_iter()
             .map(|low_point| {
                 let mut basin_points: Vec<Point> = vec![];
+                let mut visited_points = vec![low_point.clone()];
                 let mut points_to_explore = vec![low_point.clone()];
 
                 while points_to_explore.len() > 0 {
                     let mut new_points_to_explore: Vec<Point> = vec![];
-                    for &point in &points_to_explore {
-                        if !basin_points.contains(&point) && point.height != 9 {
-                            basin_points.push(point.clone());
-                        }
 
-                        for (dr, dc) in [(1, 0), (0, 1), (-1, 0), (0, -1)] {
+                    for exp_point in &points_to_explore {
+                        basin_points.push(exp_point.clone());
+
+                        // Investigate adjacent points
+                        for (dr, dc) in [(-1, 0), (0, -1), (1, 0), (0, 1)] {
                             if let Some(point) =
-                                self.point(low_point.row as i32 + dr, low_point.col as i32 + dc)
+                                self.point(exp_point.row as i32 + dr, exp_point.col as i32 + dc)
                             {
-                                if !basin_points.contains(&&&point)
-                                    && !new_points_to_explore.contains(&point)
-                                    && point.height != 9
-                                {
+                                if !visited_points.contains(&point) && point.height != 9 {
+                                    visited_points.push(point);
                                     new_points_to_explore.push(point);
                                 }
                             }
                         }
                     }
+
                     points_to_explore = new_points_to_explore;
                 }
 
                 basin_points
             })
             .collect()
+    }
+
+    fn basin_sizes(&self) -> Vec<usize> {
+        self.basins().into_iter().map(|basin| basin.len()).collect()
     }
 }
 
@@ -201,6 +205,24 @@ mod tests {
         };
         let expected = 15;
         let actual = heightmap.low_point_risk_value();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_basin_sizes() {
+        let heightmap = Heightmap {
+            heights: [
+                [2, 1, 9, 9, 9, 4, 3, 2, 1, 0],
+                [3, 9, 8, 7, 8, 9, 4, 9, 2, 1],
+                [9, 8, 5, 6, 7, 8, 9, 8, 9, 2],
+                [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
+                [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
+            ],
+        };
+        let expected = vec![3, 9, 14, 9];
+
+        let actual = heightmap.basin_sizes();
 
         assert_eq!(actual, expected);
     }
