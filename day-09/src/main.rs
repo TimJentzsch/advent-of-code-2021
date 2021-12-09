@@ -144,6 +144,10 @@ fn main() {
     let low_point_risk_value = heightmap.low_point_risk_value();
 
     println!("Low point risk value: {}", low_point_risk_value);
+
+    let biggest_basin_sizes = heightmap.biggest_basin_sizes();
+
+    println!("Biggest basin sizes: {}", biggest_basin_sizes);
 }
 
 #[cfg(test)]
