@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(Debug, PartialEq)]
 struct Heightmap<const R: usize, const C: usize> {
     heights: [[u8; C]; R],
@@ -62,7 +64,14 @@ impl<const R: usize, const C: usize> Heightmap<R, C> {
 }
 
 fn main() {
-    println!("Hello, world!");
+    // Read the input file
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let heightmap = Heightmap::<100, 100>::from_input(input);
+    let low_point_risk_value = heightmap.low_point_risk_value();
+
+    println!("Low point risk value: {}", low_point_risk_value);
 }
 
 #[cfg(test)]
