@@ -38,9 +38,27 @@ fn parse_line(line: String) -> LineEvaluation {
     }
 }
 
+fn syntax_error_score(input: String) -> usize {
+    let mut score = 0;
+
+    for line in input.trim().split('\n') {
+        if let LineEvaluation::Corrupt(ch) = parse_line(line.to_string()) {
+            score += match ch {
+                ')' => 3,
+                ']' => 57,
+                '}' => 1197,
+                '>' => 25137,
+                _ => 0,
+            };
+        }
+    }
+
+    score
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::{LineEvaluation, parse_line};
+    use crate::{LineEvaluation, parse_line, syntax_error_score};
 
     #[test]
     fn should_parse_corrupt_line() {
@@ -67,5 +85,23 @@ mod tests {
         let actual = parse_line(input);
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn should_determine_syntax_error_score() {
+        let input = "[({(<(())[]>[[{[]{<()<>>
+[(()[<>])]({[<{<<[]>>(
+{([(<{}[<>[]}>{[]{[(<()>
+(((({<>}<{<{<>}{[]{[]{}
+[[<[([]))<([[{}[[()]]]
+[{[{({}]{}}([{[{{{}}([]
+{<[[]]>}<{[{[{[]{()[[[]
+[<(<(<(<{}))><([]([]()
+<{([([[(<>()){}]>(<<{{
+<{([{{}}[<[[[<>{}]]]>[]]".to_string();
+
+        let actual = syntax_error_score(input);
+
+        assert_eq!(actual, 26397);
     }
 }
