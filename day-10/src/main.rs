@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(Debug, PartialEq)]
 enum LineEvaluation {
     Ok,
@@ -6,7 +8,13 @@ enum LineEvaluation {
 }
 
 fn main() {
-    println!("Hello, world!");
+    // Read the input file
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let syntax_score = syntax_error_score(input);
+
+    println!("Syntax error score: {}", syntax_score);
 }
 
 fn parse_line(line: String) -> LineEvaluation {
