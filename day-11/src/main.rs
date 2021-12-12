@@ -78,6 +78,19 @@ impl<const R: usize, const C: usize> OctopusGrid<R, C> {
 
         flashes
     }
+
+    /// Perform multiple steps
+    ///
+    /// Returns the number of flashes that occurred.
+    fn steps(&mut self, steps: usize) -> u32 {
+        let mut flashes = 0;
+
+        for _ in 0..steps {
+            flashes += self.step();
+        }
+
+        flashes
+    }
 }
 
 fn main() {
@@ -127,35 +140,72 @@ mod tests {
         assert_eq!(actual, expected);
     }
 
+    #[test]
     fn should_perform_step() {
         let mut octopus_grid = OctopusGrid::<10, 10>::from_input(
             "6594254334
-        3856965822
-        6375667284
-        7252447257
-        7468496589
-        5278635756
-        3287952832
-        7993992245
-        5957959665
-        6394862637"
+            3856965822
+            6375667284
+            7252447257
+            7468496589
+            5278635756
+            3287952832
+            7993992245
+            5957959665
+            6394862637"
                 .to_string(),
         );
-        let actual_steps = octopus_grid.step();
+        let actual_flashes = octopus_grid.step();
 
-        assert_eq!(actual_steps, 35);
+        assert_eq!(actual_flashes, 35);
 
         let expected_grid = OctopusGrid::<10, 10>::from_input(
             "8807476555
-        5089087054
-        8597889608
-        8485769600
-        8700908800
-        6600088989
-        6800005943
-        0000007456
-        9000000876
-        8700006848"
+            5089087054
+            8597889608
+            8485769600
+            8700908800
+            6600088989
+            6800005943
+            0000007456
+            9000000876
+            8700006848"
+                .to_string(),
+        );
+
+        assert_eq!(octopus_grid, expected_grid);
+    }
+
+    #[test]
+    fn should_perform_multiple_steps() {
+        let mut octopus_grid = OctopusGrid::<10, 10>::from_input(
+            "5483143223
+            2745854711
+            5264556173
+            6141336146
+            6357385478
+            4167524645
+            2176841721
+            6882881134
+            4846848554
+            5283751526"
+                .to_string(),
+        );
+        let actual_flashes = octopus_grid.steps(100);
+
+        assert_eq!(actual_flashes, 1656);
+
+        let expected_grid = OctopusGrid::<10, 10>::from_input(
+            "0397666866
+            0749766918
+            0053976933
+            0004297822
+            0004229892
+            0053222877
+            0532222966
+            9322228966
+            7922286866
+            6789998766"
                 .to_string(),
         );
 
