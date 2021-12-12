@@ -12,3 +12,6 @@ I will use this event to improve my Rust knowledge.
 6. [Lanternfish](day-06)
 7. [The Treachery of Whales](day-07)
 8. [Seven Segment Search](day-08)
+9. [Smoke Basin](day-09)
+10. [Syntax Scoring](day-10)
+11. [Dumbo Octopus](day-11)
