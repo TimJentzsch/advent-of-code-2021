@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(Debug, PartialEq)]
 struct OctopusGrid<const R: usize, const C: usize> {
     energy_levels: [[u8; C]; R],
@@ -94,7 +96,14 @@ impl<const R: usize, const C: usize> OctopusGrid<R, C> {
 }
 
 fn main() {
-    println!("Hello, world!");
+    // Read the input file
+    let filename = "./input/input.txt";
+    let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let mut grid = OctopusGrid::<10, 10>::from_input(input);
+    let flashes = grid.steps(100);
+
+    println!("The octopuses flashes {} times!", flashes);
 }
 
 #[cfg(test)]
