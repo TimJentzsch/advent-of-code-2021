@@ -27,6 +27,57 @@ impl<const R: usize, const C: usize> OctopusGrid<R, C> {
 
         Self { energy_levels }
     }
+
+    /// Perform a single step.
+    ///
+    /// Returns the number of flashes that occurred.
+    fn step(&mut self) -> u32 {
+        let mut flashes = 0;
+
+        // Increase energy level by 1
+        for row in 0..R {
+            for col in 0..C {
+                self.energy_levels[row][col] += 1;
+            }
+        }
+
+        // Flashes
+        let mut check_flashes = true;
+
+        while check_flashes {
+            check_flashes = false;
+
+            for row in 0..R {
+                for col in 0..C {
+                    if self.energy_levels[row][col] > 9 {
+                        check_flashes = true;
+
+                        self.energy_levels[row][col] = 0;
+                        flashes += 1;
+
+                        // Increase the energy level of adjacent octopuses
+                        for dx in [-1, 0, 1] {
+                            for dy in [-1, 0, 1] {
+                                let (r, c) = (row as i32 + dx, col as i32 + dy);
+
+                                if r >= 0
+                                    && r < R as i32
+                                    && c >= 0
+                                    && c < C as i32
+                                    // An octopus may only flash once per step
+                                    && self.energy_levels[r as usize][c as usize] > 0
+                                {
+                                    self.energy_levels[r as usize][c as usize] += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        flashes
+    }
 }
 
 fn main() {
@@ -74,5 +125,40 @@ mod tests {
         let actual = OctopusGrid::<10, 10>::from_input(input);
 
         assert_eq!(actual, expected);
+    }
+
+    fn should_perform_step() {
+        let mut octopus_grid = OctopusGrid::<10, 10>::from_input(
+            "6594254334
+        3856965822
+        6375667284
+        7252447257
+        7468496589
+        5278635756
+        3287952832
+        7993992245
+        5957959665
+        6394862637"
+                .to_string(),
+        );
+        let actual_steps = octopus_grid.step();
+
+        assert_eq!(actual_steps, 35);
+
+        let expected_grid = OctopusGrid::<10, 10>::from_input(
+            "8807476555
+        5089087054
+        8597889608
+        8485769600
+        8700908800
+        6600088989
+        6800005943
+        0000007456
+        9000000876
+        8700006848"
+                .to_string(),
+        );
+
+        assert_eq!(octopus_grid, expected_grid);
     }
 }
