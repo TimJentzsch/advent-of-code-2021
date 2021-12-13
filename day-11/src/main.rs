@@ -125,10 +125,15 @@ fn main() {
     let filename = "./input/input.txt";
     let input = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
-    let mut grid = OctopusGrid::<10, 10>::from_input(input);
+    let mut grid = OctopusGrid::<10, 10>::from_input(input.clone());
     let flashes = grid.steps(100);
 
     println!("The octopuses flashes {} times!", flashes);
+
+    let mut grid = OctopusGrid::<10, 10>::from_input(input);
+    let first_flash_sync = grid.first_flash_sync();
+
+    println!("The octopuses first sync their flashes after {} steps!", first_flash_sync);
 }
 
 #[cfg(test)]
