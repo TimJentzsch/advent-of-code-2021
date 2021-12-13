@@ -27,7 +27,7 @@ impl<const R: usize, const C: usize> OctopusGrid<R, C> {
             energy_levels[i] = Self::parse_row(row_str.to_string());
         }
 
-        Self { energy_levels }
+        Self::new(energy_levels)
     }
 
     /// Perform a single step.
