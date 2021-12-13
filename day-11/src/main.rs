@@ -93,6 +93,31 @@ impl<const R: usize, const C: usize> OctopusGrid<R, C> {
 
         flashes
     }
+
+    /// Determine if the octopuses are all flashing
+    fn all_flashing(&self) -> bool {
+        for row in 0..R {
+            for col in 0..C {
+                if self.energy_levels[row][col] != 0 {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+
+    /// Determine the number of steps until all octopuses first sync their flashes.
+    fn first_flash_sync(&mut self) -> u32 {
+        let mut steps = 0;
+
+        while !self.all_flashing() {
+            self.step();
+            steps += 1;
+        }
+
+        steps
+    }
 }
 
 fn main() {
@@ -219,5 +244,25 @@ mod tests {
         );
 
         assert_eq!(octopus_grid, expected_grid);
+    }
+
+    #[test]
+    fn should_determine_first_flash_sync() {
+        let mut octopus_grid = OctopusGrid::<10, 10>::from_input(
+            "5483143223
+            2745854711
+            5264556173
+            6141336146
+            6357385478
+            4167524645
+            2176841721
+            6882881134
+            4846848554
+            5283751526"
+                .to_string(),
+        );
+        let first_flash_sync = octopus_grid.first_flash_sync();
+
+        assert_eq!(first_flash_sync, 195);
     }
 }
